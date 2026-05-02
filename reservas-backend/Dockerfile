@@ -18,7 +18,8 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/database \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache /var/www/database
 
 COPY nginx.conf /etc/nginx/sites-available/default
 COPY start.sh /start.sh
