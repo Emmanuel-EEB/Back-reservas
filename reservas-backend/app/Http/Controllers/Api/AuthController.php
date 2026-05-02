@@ -11,26 +11,29 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
+        $fields = $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|min:6',
         ]);
+
+        // Primer usuario del sistema = admin
+        // Los demás = cliente
+        $role = User::count() === 0 ? 'admin' : 'cliente';
 
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'cliente',
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => Hash::make($fields['password']),
+            'role' => $role,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Usuario registrado correctamente',
             'user' => $user,
             'token' => $token,
-        ], 201);
+        ]);
     }
 
     public function login(Request $request)
